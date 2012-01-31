@@ -1,0 +1,64 @@
+
+<style>
+  ul.alphabetical{
+    text-align: left;
+    margin: 0;
+}
+ul {
+    -moz-padding-start: 40px;
+    display: block;
+    list-style-type: disc;
+    margin: 1em 0;
+}
+li {
+    display: inline-table;
+}
+
+ul.alphabetical li{
+    padding-bottom: 0;
+    padding-top: 0;
+    list-style: none outside none;
+    text-decoration: none;
+}
+ul.alphabetical li.active a, ul.alphabetical li{
+    color: #074D6D;
+}
+</style>
+
+<table border="1">
+  <tr>
+    <%@headings.each do |heading|%>
+    <th>
+      <%=sort_link_helper @action, heading[0], heading[1], params, false,{:mode_type => params[:mode_type]} %> |
+      <%=sort_link_helper @action, heading[0], heading[1], params, true %>
+    </th>
+    <%end%>
+  </tr>
+  <tr>
+    <%if filter%>
+      <% form_tag({:action=>@action}, :method=>'get') do %>
+       <%@headings.each do |heading|%>
+       <td>
+          <%=text_field_tag("#{heading[1]}", params["#{heading[1]}"], :size => 10 ) %>
+       </td>
+       <%end%>
+       <td><%=submit_tag 'Go'%></td>
+      <% end %>
+    <%end%>
+  </tr>
+  <tr>
+    <td colspan="#{<%=@headings.size%>}">
+      <%= letter_search(params)%>
+    </td>
+  </tr>
+  <%@objects.each do |obj|%>
+  <tr>
+    <%@headings.each do |heading|%>
+    <td><%= obj.instance_eval(heading[1]) %></td>
+    <%end%>
+    <td>Action</td>
+  </tr>
+  <%end%>
+</table>
+
+<%= will_paginate(@objects).to_s %>

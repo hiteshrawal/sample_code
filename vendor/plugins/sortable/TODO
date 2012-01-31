@@ -1,0 +1,8 @@
+#TODO
+
+1) Need to add relations for :joins(currently it is supporting only :include)
+2) Need to make more generic to the 'sort_link_helper'
+3) Can avoid the secondary_sort array from config & get_sorted_objects.
+4) Need to update test cases.
+5) Need to add/update comments.
+6) Need to update example code.
