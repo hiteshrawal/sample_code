@@ -1,71 +1,19 @@
-## SQLite version 3.x
-#development:
-#  adapter: sqlite3
-#  database: db/development.sqlite3
-#  pool: 5
-#  timeout: 5000
-#
-#test:
-#  adapter: sqlite3
-#  database: db/test.sqlite3
-#  pool: 5
-#  timeout: 5000
-#
-#production:
-#  adapter: sqlite3
-#  database: db/production.sqlite3
-#  pool: 5
-#  timeout: 5000
-
-#development:
-#  adapter: postgresql
-#  encoding: utf8
-#  database: demoapp
-#  pool: 10
-#  username: livia
-#  password: livia
-#  host: localhost
-#
-#production:
-#  adapter: postgresql
-#  encoding: utf8
-#  database: demoapp
-#  pool: 10
-#  username: livia
-#  password: livia
-#  host: localhost
-#
-#test:
-#  adapter: postgresql
-#  encoding: utf8
-#  database: demoapp
-#  pool: 10
-#  username: livia
-#  password: livia
-#  host: localhost
+# SQLite version 3.x
 development:
-  adapter: postgresql
-  encoding: utf8
-  database: demoapp
-  pool: 10
-  username: livia
-  password: livia
-  host: localhost
-
-production:
-  adapter: postgresql
-  encoding: utf8
-  database: demoapp
-  pool: 10
-  username: livia
-  password: livia
-  host: localhost
+  adapter: sqlite3
+  database: db/development.sqlite3
+  pool: 5
+  timeout: 5000
 
 test:
-  adapter: postgresql
-  encoding: utf8
-  database: demoapp
-  pool: 10
-  username: livia
-  password: livia
-  host: localhost
+  adapter: sqlite3
+  database: db/test.sqlite3
+  pool: 5
+  timeout: 5000
+
+production:
+  adapter: sqlite3
+  database: db/production.sqlite3
+  pool: 5
+  timeout: 5000
+
