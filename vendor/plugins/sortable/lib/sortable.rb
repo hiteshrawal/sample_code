@@ -120,6 +120,7 @@ module Sortable
         default_sort = options[:default_sort].nil? ? ['id', 'DESC'] : options[:default_sort]
         per_page = options[:per_page].nil? ? 10 : options[:per_page]
         include_relations = options[:include_relations].nil? ? [] : options[:include_relations]
+        join_relations = options[:join_relations].nil? ? [] : options[:join_relations]
         secondary_sort = options[:secondary_sort].nil? ? [] : options[:secondary_sort]
         filter_map = options[:filter_map].nil? ? [] : options[:filter_map]
         letter_search = options[:letter_search].nil? ? [] :options[:letter_search]
@@ -134,7 +135,8 @@ module Sortable
                                                      :include_relations => include_relations,
                                                      :secondary_sort => secondary_sort,
                                                      :filter_map => filter_map,
-                                                     :letter_search => letter_search
+                                                     :letter_search => letter_search,
+                                                     :join_relations => join_relations
                                                      }
         
         module_eval do
@@ -165,6 +167,10 @@ module Sortable
           
           def sortable_include_relations
             @@sortable_table_options[controller_path][:include_relations]
+          end
+
+          def sortable_join_relations
+            @@sortable_table_options[controller_path][:join_relations]
           end
 
           def sortable_secondary_sort
@@ -198,6 +204,7 @@ module Sortable
       def get_sorted_objects(params, options={})                           
         objects = options[:objects].nil? ? sortable_class : options[:objects]
         include_rel = options[:include_relations].nil? ? sortable_include_relations : options[:include_relations]
+        join_rel = options[:join_relations].nil? ? sortable_join_relations : options[:join_relations]
         @headings = options[:table_headings].nil? ? sortable_table_headings : options[:table_headings]
         sort_map = options[:sort_map].nil? ? sortable_sort_map : HashWithIndifferentAccess.new(options[:sort_map])
         default_sort = options[:default_sort].nil? ? sortable_default_sort : options[:default_sort]
@@ -219,16 +226,24 @@ module Sortable
         page = params[:page]
         page ||= 1
         # fetch the objects, paginated and sorted as desired along with any extra filtering conditions
-        get_paginated_objects(objects, sort, include_rel, conditions, page, items_per_page)
+        get_paginated_objects(objects, sort, include_rel, conditions, page, items_per_page, join_rel)
       end
       
       private
-      def get_paginated_objects(objects, sort, include_rel, conditions, page, items_per_page)
-        @objects = objects.paginate(:include => include_rel, 
-                                 :order => sort, 
-                                 :conditions => conditions,
-                                 :page => page,
-                                 :per_page => items_per_page)
+      def get_paginated_objects(objects, sort, include_rel, conditions, page, items_per_page, join_rel)
+        if join_rel.present?
+          @objects = objects.paginate(:joins => join_rel,
+                                   :order => sort,
+                                   :conditions => conditions,
+                                   :page => page,
+                                   :per_page => items_per_page)
+        else
+          @objects = objects.paginate(:include => include_rel,
+                                   :order => sort,
+                                   :conditions => conditions,
+                                   :page => page,
+                                   :per_page => items_per_page)
+        end
       end
 
       def process_search(params, conditions, search_array)
@@ -247,13 +262,12 @@ module Sortable
         return conditions
       end
 
-      # Add filter search
       def process_filter(params, conditions, filter_map)
         filter_map.each do |key,value|
           if params.has_key?(key)
             if !params[key].blank?
               conditions += ' and ' unless conditions.blank?
-              column_type = get_column_type(key)
+              column_type = get_column_type(value)
               if column_type == :string
                 conditions += value + " ILIKE  '%#{params[key]}%'"
               elsif column_type == :datetime
@@ -352,19 +366,23 @@ module Sortable
         return mapKey
       end
 
-      def get_column_type(key)
-        key_array = key.split('.')
-        klass = get_column_class(key_array)
+      def get_column_type(value)
+        value_array = value.split('.')
         data_type = :string
-        klass.columns.each do |column|
-          data_type = column.type if column.name.eql?(key_array.last)
+        begin
+          klass = get_column_class(value_array)
+          klass.columns.each do |column|
+            data_type = column.type if column.name.eql?(value_array.last)
+          end
+          data_type
+        rescue
+          data_type
         end
-        data_type
       end
 
-      def get_column_class(key_array)
-        if key_array.size > 1
-          key_array[key_array.size-2].camelize.constantize
+      def get_column_class(value_array)
+        if value_array.size > 1
+          value_array[value_array.size-2].singularize.camelize.constantize
         else
           sortable_class
         end

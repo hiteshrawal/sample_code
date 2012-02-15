@@ -23,13 +23,43 @@ ul.alphabetical li{
 ul.alphabetical li.active a, ul.alphabetical li{
     color: #074D6D;
 }
+
+/* from portal */
+.fr, .header_nav, .column_fav, #TB_closeWindow, #TB_closeAjaxWindow {
+    float: right;
+}
+
+.mt8, .mtb8, .buttonSub_div, ul.tabs-nav {
+    margin-top: 8px;
+}
+
+.icon_sort_up_disabled {
+    background: url("../images/up-disabled.gif") repeat scroll 0 0 transparent;
+    height: 4px;
+    width: 8px;
+}
+
+.icon_sort_down {
+    background-image: url("../images/livia_portal_base_images.png");
+    background-position: -66px -431px;
+    height: 4px;
+    width: 8px;
+    background-repeat: no-repeat;
+}
+
+.icon_sort_up{
+    background-image: url("../images/livia_portal_base_images.png");
+    background-position: -58px -431px;
+    height: 4px;
+    width: 8px;
+    background-repeat: no-repeat;
+}
 </style>
 
 <table border="1">
   <tr>
     <%@headings.each do |heading|%>
     <th>
-      <%=sort_link_helper @action, heading[0], heading[1], params, false,{:mode_type => params[:mode_type]} %> |
       <%=sort_link_helper @action, heading[0], heading[1], params, true %>
     </th>
     <%end%>
